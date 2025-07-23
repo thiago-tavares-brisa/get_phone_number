@@ -129,24 +129,39 @@ class GetPhoneNumberPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     }
 
     @SuppressLint("HardwareIds")
+
 private fun getSimCardList(result: Result) {
-
-
     val simJsonArray = JSONArray()
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-        for (subscriptionInfo in getSubscriptions()) {
-            val simCard = SimCard(telephonyManager, subscriptionInfo)
-            simJsonArray.put(simCard.toJSON())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    context, 
+                    Manifest.permission.READ_PHONE_STATE
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                for (subscriptionInfo in getSubscriptions()) {
+                    val simCard = SimCard(telephonyManager, subscriptionInfo)
+                    simJsonArray.put(simCard.toJSON())
+                }
+            }
+
+        } else {
+            for (subscriptionInfo in getSubscriptions()) {
+                val simCard = SimCard(telephonyManager, subscriptionInfo)
+                simJsonArray.put(simCard.toJSON())
+            }
         }
     }
-
     if (simJsonArray.length() == 0) {
         getSingleSimCard()?.let { simCard ->
             simJsonArray.put(simCard.toJSON())
         }
     }
+
     result.success(simJsonArray.toString())
 }
+
     // private fun getSimCardList(result: Result) {
     //     val simJsonArray = JSONArray()
     //     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
