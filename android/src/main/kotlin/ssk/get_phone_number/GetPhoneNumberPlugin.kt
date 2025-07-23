@@ -129,22 +129,40 @@ class GetPhoneNumberPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     }
 
     @SuppressLint("HardwareIds")
-    private fun getSimCardList(result: Result) {
-        val simJsonArray = JSONArray()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            for (subscriptionInfo in getSubscriptions()) {
-                val simCard = SimCard(telephonyManager, subscriptionInfo)
-                simJsonArray.put(simCard.toJSON())
-            }
-        }
-        if (simJsonArray.length() == 0) {
-            getSingleSimCard()?.let { simCard ->
-                simJsonArray.put(simCard.toJSON())
-            }
-        }
+private fun getSimCardList(result: Result) {
 
-        result.success(simJsonArray.toString())
+
+    val simJsonArray = JSONArray()
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+        for (subscriptionInfo in getSubscriptions()) {
+            val simCard = SimCard(telephonyManager, subscriptionInfo)
+            simJsonArray.put(simCard.toJSON())
+        }
     }
+
+    if (simJsonArray.length() == 0) {
+        getSingleSimCard()?.let { simCard ->
+            simJsonArray.put(simCard.toJSON())
+        }
+    }
+    result.success(simJsonArray.toString())
+}
+    // private fun getSimCardList(result: Result) {
+    //     val simJsonArray = JSONArray()
+    //     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+    //         for (subscriptionInfo in getSubscriptions()) {
+    //             val simCard = SimCard(telephonyManager, subscriptionInfo)
+    //             simJsonArray.put(simCard.toJSON())
+    //         }
+    //     }
+    //     if (simJsonArray.length() == 0) {
+    //         getSingleSimCard()?.let { simCard ->
+    //             simJsonArray.put(simCard.toJSON())
+    //         }
+    //     }
+
+    //     result.success(simJsonArray.toString())
+    // }
 
     @SuppressLint("HardwareIds")
     fun getSingleSimCard(): SimCard? {
